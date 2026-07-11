@@ -7,6 +7,7 @@ export default function ProductPage() {
   const [progress, setProgress] = useState(0);
   const [trained, setTrained] = useState(false);
   const [prediction, setPrediction] = useState("");
+  const [model, setModel] = useState("Auto");
 
   const trainModel = () => {
     setTraining(true);
@@ -107,6 +108,28 @@ export default function ProductPage() {
           <p>
             Test your trained model with one input row before downloading it.
           </p>
+          <div className={styles.fieldGroup}>
+            {/* <label className={styles.fieldLabel}>Choose Model</label> */}
+
+            <select
+              className={styles.select}
+              value={model}
+              onChange={(e) => setModel(e.target.value)}
+            >
+              <option>
+                  --- Choose model ---
+                </option>
+              <option>Linear Regression</option>
+              <option>Random Forest</option>
+              <option>XGBoost</option>
+              <option>LightGBM</option>
+              <option>CatBoost</option>
+              <option>Decision Tree</option>
+              <option>Support Vector Machine</option>
+              <option>KNN</option>
+              <option>Neural Network (MLP)</option>
+            </select>
+          </div>
 
           <textarea
             value={prediction}

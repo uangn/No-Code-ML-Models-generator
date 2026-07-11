@@ -271,6 +271,37 @@ button:disabled {
   color: #123b73;
 }
 
+.fieldLabel {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 700;
+  color: #334155;
+}
+
+.select {
+  width: 100%;
+  padding: 15px 16px;
+  border: 1px solid #d9e3f0;
+  border-radius: 14px;
+  background: white;
+  color: #123b73;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: 0.2s;
+  box-sizing: border-box;
+}
+
+.select:hover {
+  border-color: #123b73;
+}
+
+.select:focus {
+  outline: none;
+  border-color: #123b73;
+  box-shadow: 0 0 0 4px rgba(18, 59, 115, 0.12);
+}
+
 @media (max-width: 960px) {
   .workspace {
     grid-template-columns: 1fr;
