@@ -1,1 +1,8 @@
-[]
+[
+  {
+    "model_id": "9ccc6944-a203-4c55-a849-4729a2d9f83f",
+    "model_path": "models/9ccc6944-a203-4c55-a849-4729a2d9f83f.pkl",
+    "need_encode": true,
+    "need_scale": true
+  }
+]

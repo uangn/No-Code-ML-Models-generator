@@ -1,12 +1,19 @@
 import json
+import select
+from matplotlib.pylab import f
 from openai import OpenAI
 import pandas as pd
 from models.regression_model import train as train_regressor
 from models.classification_model import train as train_classifier
 from dotenv import load_dotenv
 import os
+from .feature_selection import CustomTargetPipeline
+
+
 
 load_dotenv()
+
+print(os.getenv("JDNFJCJDJSMAKXNSJSMXS"))
 
 client = OpenAI(
   api_key=os.getenv("JDNFJCJDJSMAKXNSJSMXS"),
@@ -124,6 +131,8 @@ def run_agent(user_prompt, csv_file):
   csv_sample = df.head(10).to_dict(orient="records")
   csv_summary = df.describe(include="all").to_dict()
   
+  feature_extractor = CustomTargetPipeline()
+  
   input_messages = [
     {
       "role": "system",
@@ -135,9 +144,8 @@ def run_agent(user_prompt, csv_file):
         Your job:
         1. Read the user's request.
         2. Inspect the CSV columns, dtypes, summary, and sample rows.
-        3. Choose the correct X feature columns.
-        4. Choose the correct y target column.
-        5. You must choose exactly one of these three task types:
+        3. Choose the correct y target column.
+        4. You must choose exactly one of these three task types:
           - "classifier" (if the goal is to predict a category, label, or discrete group) with train_classifier
           - "regressor" (if the goal is to predict a continuous numerical value or score) with train_regressor
           - "association" [CURRENTLY UNAVAILABLE] (if the goal is to find relationships, frequent patterns, or rules between items, with no single target column) with train_associtation
@@ -171,12 +179,13 @@ def run_agent(user_prompt, csv_file):
       """
     }
   ]
+  pipepline = CustomTargetPipeline()
   # print(input_messages)
   response = None
   for attempt in range(5):
     try:
       response = client.responses.create(
-        model="openai/gpt-oss-120b:free",
+        model="openrouter/free",
         input=input_messages,
         tools=tools
       )
@@ -186,17 +195,29 @@ def run_agent(user_prompt, csv_file):
   
   if not response:
     return "Fail to connect LLM"
-  print(response.output)
+  print("Response received")
+  
+  
   for item in response.output:
     
     if item.type != "function_call":
       continue
     
-    print(input_messages)
-    
+    # print(input_messages)
+    print("Item fetched")
     args = json.loads(item.arguments)
+    print("Arguments parsed")
+    result = feature_extractor.fit(csv_file, args["target_y_columns"])
+    selected_features = pipepline.fit(csv_file, args["target_y_columns"])[args['target_y_columns'][0]]['selected_features']
+    print("Found for target column:", args['target_y_columns'][0], "\nFeatures:", selected_features)
     if item.name == "train_regressor":
-      result = train_regressor(**args)
+      result = train_regressor(
+        csv_file=csv_file, 
+        target_x_columns=selected_features, 
+        target_y_columns=args['target_y_columns'], 
+        need_scale=args['need_scale'], 
+        need_encode=args['need_encode']
+      )
     elif item.name == "train_classifier":
       result = train_classifier(**args)
 
@@ -214,7 +235,7 @@ def run_agent(user_prompt, csv_file):
   for i in range(5):
     try:
       final_response = client.responses.create(
-        model="openai/gpt-oss-120b:free",
+        model="openrouter/free",
         input=input_messages,
         tools=tools
       )

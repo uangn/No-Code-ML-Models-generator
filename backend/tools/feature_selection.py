@@ -10,6 +10,7 @@ from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import OrdinalEncoder, LabelEncoder
 
 ID_COLUMN_NAMES = {
+  "passengerid",
   "id",
   "case",
   "index",
@@ -19,6 +20,7 @@ ID_COLUMN_NAMES = {
   "record_id",
   "uuid"
 }
+
 class CustomTargetPipeline:
   def __init__(
     self,
@@ -78,6 +80,7 @@ class CustomTargetPipeline:
       if (
         normalized_name == "id"
         or normalized_name.endswith("_id")
+        or normalized_name.endswith("id")
         or "uuid" in normalized_name
         or normalized_name == "index"
       ):
@@ -252,7 +255,7 @@ class CustomTargetPipeline:
         "preprocessor": preprocessor,
         "selector": selector
       }
-
+      print(f"Selected features X for {target}: {selected_features}")
       results[target] = {
         "task_type": (
           "classification"
@@ -272,6 +275,6 @@ class CustomTargetPipeline:
     return results
 
 
-pipeline = CustomTargetPipeline(ignored_columns=ID_COLUMN_NAMES)
-result = pipeline.fit('/Users/minhquang/Desktop/SS 2026/No-Code-ML-Models-generator/backend/models/possum.csv', ["age", "hdlngth", "sex"])
-print(result)
+# pipeline = CustomTargetPipeline(ignored_columns=ID_COLUMN_NAMES)
+# result = pipeline.fit('/Users/minhquang/Desktop/SS 2026/No-Code-ML-Models-generator/backend/models/predict_survival.csv', ["Survived"])
+# print(result)
